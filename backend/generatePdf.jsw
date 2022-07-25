@@ -1,0 +1,172 @@
+import {fetch} from 'wix-fetch'; 
+import {getSecret} from 'wix-secrets-backend';
+
+
+export async function getTemplates() {
+
+    const api_key = await getSecret("api_key");
+    return fetch("https://api.craftmypdf.com/v1/list-templates?limit=300&offset=0", 
+    {"method": 'GET',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key}})
+    .then(response => response.json())
+    .then(json => {
+        var options = [];
+        (json.templates).forEach((template) => {
+
+        options.push({
+          value: template.template_id,
+          label: template.name
+        });
+      })
+      return options
+    });
+    
+    //console.log(data)
+    // return options;
+}
+
+export async function getPDF(template_id, data){
+
+    const api_key = await getSecret("api_key");
+    var json_payload = JSON.stringify({
+  "data": data,
+  "output_file": "output.pdf",
+  "export_type": "json",
+  "expiration": 10,
+  "template_id": template_id
+});
+    console.log(json_payload)
+    return fetch("https://api.craftmypdf.com/v1/create", 
+    {"method": 'POST',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key},
+    "body":json_payload
+    })
+    .then(response => response.json())
+    .then(json => {
+        console.log(json.file)
+        return json.file
+    });
+
+
+}
+
+export async function getImage(template_id, data){
+
+    const api_key = await getSecret("api_key");
+    var json_payload = JSON.stringify({
+  "data": data,
+  "output_file": "output.jpg",
+  "export_type": "json",
+  "expiration": 10,
+  "template_id": template_id
+});
+    console.log(json_payload)
+    return fetch("https://api.craftmypdf.com/v1/create-image", 
+    {"method": 'POST',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key},
+    "body":json_payload
+    })
+    .then(response => response.json())
+    .then(json => {
+        console.log(json.file)
+        return json.file
+    });
+
+}
+
+export async function startEditor(template_id){
+
+    const api_key = await getSecret("api_key");
+    var json_payload = JSON.stringify({
+      "expiration": 1440 ,
+      "template_id": template_id,
+      "canSave": true,
+      "canCreatePDF": true,
+      "canViewSettings": true,
+      "canPreview": true,
+      "canEditJSON": true,
+      "canShowHeader": true,
+      "backURL": "https://alamimran21510.wixsite.com/craftmypdf"
+});
+    console.log(json_payload)
+    return fetch("https://api.craftmypdf.com/v1/create-editor-session", 
+    {"method": 'POST',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key},
+    "body":json_payload
+    })
+    .then(response => response.json())
+    .then(json => {
+        console.log(json)
+        return json.url
+    });
+
+
+}
+
+
+export async function updateTemplate(template_id,name){
+
+    const api_key = await getSecret("api_key");
+    var json_payload = JSON.stringify({
+      "template_id": template_id,
+      "name": name
+    });
+    console.log(json_payload)
+    return fetch("https://api.craftmypdf.com/v1/update-template", 
+    {"method": 'POST',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key},
+    "body":json_payload
+    })
+    .then(response => response.json())
+    .then(json => {
+        console.log(json)
+    });
+
+
+}
+
+
+export async function createTemplate(name,template_id){
+
+    const api_key = await getSecret("api_key");
+    var json_payload = JSON.stringify({
+      "template_id": template_id,
+      "name": name
+    });
+    console.log(json_payload)
+    return fetch("https://api.craftmypdf.com/v1/new-template-from", 
+    {"method": 'POST',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key},
+    "body":json_payload
+    })
+    .then(response => response.json())
+    .then(json => {
+        console.log(json)
+    });
+
+
+}
+
+export async function asynchronousPDF(template_id, data){
+
+    const api_key = await getSecret("api_key");
+    var json_payload = JSON.stringify({
+      "data": data,
+      "webhook_url":"https://alamimran21510.wixsite.com/craftmypdf",
+      "expiration": 10,
+      "template_id": template_id
+    })
+    console.log(json_payload)
+    return fetch("https://api.craftmypdf.com/v1/create-async", 
+    {"method": 'POST',"headers":{'Content-Type': 'application/json',
+    "X-API-KEY": api_key},
+    "body":json_payload
+    })
+    .then(response => response.json())
+    .then(json => {
+        console.log(json)
+        return json
+    });
+
+
+}
